@@ -13,6 +13,10 @@
 		BE254FA829BFCFC5004FE9AE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE254FA729BFCFC5004FE9AE /* Preview Assets.xcassets */; };
 		BE254FB129BFD05A004FE9AE /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FB029BFD05A004FE9AE /* Book.swift */; };
 		BE254FB329BFD074004FE9AE /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FB229BFD074004FE9AE /* Home.swift */; };
+		BE254FB529C015D2004FE9AE /* RatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FB429C015D2004FE9AE /* RatingView.swift */; };
+		BE254FB729C01602004FE9AE /* ScrollViewDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FB629C01602004FE9AE /* ScrollViewDetector.swift */; };
+		BE254FB929C01626004FE9AE /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FB829C01626004FE9AE /* DetailView.swift */; };
+		BE254FBB29C01A81004FE9AE /* CustomCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBA29C01A81004FE9AE /* CustomCorners.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +27,10 @@
 		BE254FA729BFCFC5004FE9AE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BE254FB029BFD05A004FE9AE /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
 		BE254FB229BFD074004FE9AE /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
+		BE254FB429C015D2004FE9AE /* RatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingView.swift; sourceTree = "<group>"; };
+		BE254FB629C01602004FE9AE /* ScrollViewDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewDetector.swift; sourceTree = "<group>"; };
+		BE254FB829C01626004FE9AE /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		BE254FBA29C01A81004FE9AE /* CustomCorners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCorners.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +85,10 @@
 			isa = PBXGroup;
 			children = (
 				BE254FB229BFD074004FE9AE /* Home.swift */,
+				BE254FB829C01626004FE9AE /* DetailView.swift */,
+				BE254FB429C015D2004FE9AE /* RatingView.swift */,
+				BE254FB629C01602004FE9AE /* ScrollViewDetector.swift */,
+				BE254FBA29C01A81004FE9AE /* CustomCorners.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -162,6 +174,10 @@
 				BE254FA329BFCFC3004FE9AE /* ContentView.swift in Sources */,
 				BE254FA129BFCFC3004FE9AE /* CarouselGeometryEffectApp.swift in Sources */,
 				BE254FB329BFD074004FE9AE /* Home.swift in Sources */,
+				BE254FB929C01626004FE9AE /* DetailView.swift in Sources */,
+				BE254FB729C01602004FE9AE /* ScrollViewDetector.swift in Sources */,
+				BE254FBB29C01A81004FE9AE /* CustomCorners.swift in Sources */,
+				BE254FB529C015D2004FE9AE /* RatingView.swift in Sources */,
 				BE254FB129BFD05A004FE9AE /* Book.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

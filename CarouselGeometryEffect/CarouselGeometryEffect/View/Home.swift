@@ -14,6 +14,10 @@ struct Home: View {
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
     @Namespace private var animation
+    /// Detail View Properties
+    @State private var showDetailView: Bool = false
+    @State private var selectedBook: Book?
+    @State private var animateCurrentBook: Bool = false
     
     var body: some View {
         VStack(spacing: 15) {
@@ -47,8 +51,20 @@ struct Home: View {
                 let size = $0.size
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
-                        ForEach(sampleBooks) {
-                            BooksCardView($0)
+                        ForEach(sampleBooks) { book in
+                            BooksCardView(book)
+                                /// カードをタップすると詳細画面が表示されます。
+                                .onTapGesture {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        animateCurrentBook = true
+                                        selectedBook = book
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                        withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
+                                            showDetailView.toggle()
+                                        }
+                                    }
+                                }
                         }
                     }
                     .padding(.horizontal, 15)
@@ -66,6 +82,20 @@ struct Home: View {
                 .coordinateSpace(name: "SCROLLVIEW")
             }
             .padding(.top, 15)
+        }
+        .overlay {
+            if let selectedBook, showDetailView {
+                DetailView(show: $showDetailView, animation: animation, book: selectedBook)
+                    .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
+            }
+        }
+        
+        .onChange(of: showDetailView) { newValue in
+            if !newValue {
+                withAnimation(.easeInOut(duration: 0.35).delay(0.4)) {
+                    animateCurrentBook = false
+                }
+            }
         }
     }
     
@@ -89,8 +119,9 @@ struct Home: View {
                     Text(book.title)
                         .font(.title3)
                         .fontWeight(.semibold)
+                        .foregroundColor(.black)
                     
-                    Text("By \(book.author)")
+                    Text(": \(book.author)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     
@@ -121,17 +152,23 @@ struct Home: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, x: -5, y: -5)
                 }
                 .zIndex(1)
+                /// Moving the book, it it's tapped
+                .offset(x: animateCurrentBook && selectedBook?.id == book.id ? -20 : 0)
                 
                 /// Book Cover Image
                 ZStack {
-                    Image(book.imageName)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: size.width / 2, height: size.height)
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        // Applying Shadow
-                        .shadow(color: .black.opacity(0.1), radius: 5, x: 5, y: -5)
-                        .shadow(color: .black.opacity(0.1), radius: 5, x: -5, y: -5)
+                    if !(showDetailView && selectedBook?.id == book.id) {
+                        Image(book.imageName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: size.width / 2, height: size.height)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            /// Matched Geometry ID
+                            .matchedGeometryEffect(id: book.id, in: animation)
+                            // Applying Shadow
+                            .shadow(color: .black.opacity(0.1), radius: 5, x: 5, y: -5)
+                            .shadow(color: .black.opacity(0.1), radius: 5, x: -5, y: -5)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -178,6 +215,15 @@ struct Home: View {
                             }
                         }
                 }
+                
+                /// Add Tag
+                Button {
+                    
+                } label: {
+                    Image(systemName: "plus.app.fill")
+                        .foregroundColor(Color.gray.opacity(0.5))
+                }
+                .padding(.leading, 5)
             }
             .padding(.horizontal, 15)
         }
@@ -189,93 +235,6 @@ var tags: [String] =
 [
 "全て", "CD", "トートバッグ", "缶バッジ", "DVD",
 ]
-
-struct RatingView: View {
-    var rating: Int
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(1...5, id: \.self) { index in
-                Image(systemName: "star.fill")
-                    .font(.caption2)
-                    .foregroundColor(index <= rating ? .yellow : .gray.opacity(0.3))
-            }
-            
-            Text("(\(rating))")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundColor(.yellow)
-                .padding(.leading, 5)
-        }
-    }
-}
-
-struct ScrollViewDetector: UIViewRepresentable {
-    
-    @Binding var carouselMode: Bool
-    var totalContent: Int = 0
-    
-    func makeUIView(context: Context) -> UIView {
-        return UIView()
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {
-        DispatchQueue.main.async {
-            if let scrollView = uiView.superview?.superview?.superview as? UIScrollView {
-                scrollView.decelerationRate = carouselMode ? .fast : .normal
-                if carouselMode {
-                    scrollView.delegate = context.coordinator
-                } else {
-                    scrollView.delegate = nil
-                }
-                
-                /// Updateing Total Count in real time -リアルタイムで総カウント数を更新する-
-                context.coordinator.totalContent = totalContent
-            }
-        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(parent: self)
-    }
-    
-    class Coordinator: NSObject, UIScrollViewDelegate {
-        var parent: ScrollViewDetector
-        init(parent: ScrollViewDetector) {
-            self.parent = parent
-        }
-        
-        var totalContent: Int = 0
-        var velocityY: CGFloat = 0
-        
-        func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-            /// Removing Invalid Scroll Position's -無効なスクロール位置の削除-
-            let cardHeight: CGFloat = 220
-            let cardSpacing: CGFloat = 35
-            /// Adding velocity for more natural feel -ベロシティを追加して、より自然な感じを出す-
-            let targetEnd: CGFloat = scrollView.contentOffset.y + (velocity.y * 60)
-            let index = (targetEnd / cardHeight).rounded()
-            let modifiedEnd = index * cardHeight
-            let spacing = cardSpacing * index
-            
-            targetContentOffset.pointee.y = modifiedEnd + spacing
-            velocityY = velocity.y
-            
-        }
-        
-        func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-            /// Removing Invalid Scroll Position's -無効なスクロール位置の削除-
-            let cardHeight: CGFloat = 220
-            let cardSpacing: CGFloat = 35
-            /// Adding velocity for more natural feel -ベロシティを追加して、より自然な感じを出す-
-            let targetEnd: CGFloat = scrollView.contentOffset.y + (velocityY * 60)
-            let index = max(min((targetEnd / cardHeight).rounded(), CGFloat(totalContent - 1)), 0.0)
-            let modifiedEnd = index * cardHeight
-            let spacing = cardSpacing * index
-            
-            scrollView.setContentOffset(.init(x: 0, y: modifiedEnd + spacing), animated: true)
-        }
-    }
-}
 
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
